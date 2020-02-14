@@ -1,4 +1,4 @@
-import React, { useReducer } from 'react';
+import React, { useReducer, useEffect } from 'react';
 
 import './Input.css';
 import { validate } from '../../util/validators';
@@ -27,7 +27,21 @@ const Input = props => {
 
     //useReducer é usado quando o state precisa ser menipulado de uma forma mais complexa
     //ver mais sobre depois
-    const [inputState, dispatch] = useReducer(inputReducer, {value: '', isTouched: false, isValid: false});
+    const [inputState, dispatch] = useReducer(inputReducer, {
+        value: '', 
+        isTouched: false, 
+        isValid: false
+    });
+
+    //é preciso usar desctructuring pois os outros valores podem mudar a qualquer momento
+    //arry destructuring
+    const {id, onInput} = props;
+    const {value, isValid} = inputState;
+
+    //usado para executar algo sempre os parâmetros "[]" mudam
+    useEffect(() => {
+        onInput(id, value, isValid)
+    }, [id, value, isValid, onInput]);
 
     const changeHandler = event => {
         dispatch({type: 'CHANGE', val: event.target.value, validators: props.validators});
