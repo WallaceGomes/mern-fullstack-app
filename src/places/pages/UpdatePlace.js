@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import Input from '../../shared/components/FormElements/Input';
 import { VALIDATOR_REQUIRE, VALIDATOR_MINLENGTH } from '../../shared/util/validators';
@@ -36,20 +36,41 @@ const TEMP_PLACES = [
 
 
 const UpdatePlace = () => {
+
+    const [isLoading, setIsLoading] = useState(true);
+
     const placeId = useParams().placeId;
 
-    const indentifiedPlace = TEMP_PLACES.find(p => p.id === placeId);
-
-    const [formState, inputHandler] = useForm({
+    const [formState, inputHandler, setFormData] = useForm({
         title: {
-            value: indentifiedPlace.title,
-            isValid: true
+            value: '',
+            isValid: false
         },
         description: {
-            value: indentifiedPlace.description,
-            isValid: true
+            value: '',
+            isValid: false
         }
-    }, true);
+    }, false);
+
+    //movido temporáriamente para simular um atraso no recebimento dos dados do form
+    const indentifiedPlace = TEMP_PLACES.find(p => p.id === placeId);
+
+    //usando o setFormData para atribuir os valores carregados após o render da página
+    //useEffect impede que o componente renderize novamente após os dados recebidos???
+    useEffect(() => {
+        setFormData(
+            {
+            title: {
+                value: indentifiedPlace.title,
+                isValid: true
+            },
+            description: {
+                value: indentifiedPlace.description,
+                isValid: true
+            }
+        }, true);
+        setIsLoading(false)
+    }, [setFormData, indentifiedPlace]);
 
     const placeUpdateSubmitHandler = event => {
         event.preventDefault();
@@ -60,6 +81,14 @@ const UpdatePlace = () => {
         return (
             <div className="center">
                 <h2>Could not find a place!</h2>
+            </div>
+        );
+    }
+
+    if (isLoading) {
+        return (
+            <div className="center">
+                <h2>Loading...</h2>
             </div>
         );
     }
