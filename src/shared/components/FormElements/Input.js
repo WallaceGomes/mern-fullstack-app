@@ -28,9 +28,9 @@ const Input = props => {
     //useReducer é usado quando o state precisa ser menipulado de uma forma mais complexa
     //ver mais sobre depois
     const [inputState, dispatch] = useReducer(inputReducer, {
-        value: props.value || '', 
+        value: props.initialvalue || '', 
         isTouched: false, 
-        isValid: props.valid || false
+        isValid: props.initialvalid || false
     });
 
     //é preciso usar desctructuring pois os outros valores podem mudar a qualquer momento
