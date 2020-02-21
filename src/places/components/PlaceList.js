@@ -6,6 +6,8 @@ import PlaceItem from './PlaceItem';
 import Button from '../../shared/components/FormElements/Button';
 
 const PlaceList = props => {
+
+    // Caso não exista nada na lista
     if (props.items.length === 0) {
         return (
             <div className="place-list center">
