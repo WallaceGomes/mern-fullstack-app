@@ -6,6 +6,7 @@ import Button from '../../shared/components/FormElements/Button';
 
 import './PlaceForm.css';
 import { useForm } from '../../shared/hooks/form-hook';
+import Card from '../../shared/components/UIElements/Card';
 
 const TEMP_PLACES = [
     {
@@ -58,17 +59,20 @@ const UpdatePlace = () => {
     //usando o setFormData para atribuir os valores carregados após o render da página
     //useEffect impede que o componente renderize novamente após os dados recebidos???
     useEffect(() => {
-        setFormData(
-            {
-            title: {
-                value: indentifiedPlace.title,
-                isValid: true
-            },
-            description: {
-                value: indentifiedPlace.description,
-                isValid: true
-            }
-        }, true);
+        //se identifiedPlace existir ok
+        if (indentifiedPlace) {
+            setFormData(
+                {
+                title: {
+                    value: indentifiedPlace.title,
+                    isValid: true
+                },
+                description: {
+                    value: indentifiedPlace.description,
+                    isValid: true
+                }
+            }, true);
+        }
         setIsLoading(false)
     }, [setFormData, indentifiedPlace]);
 
@@ -80,7 +84,7 @@ const UpdatePlace = () => {
     if (!indentifiedPlace) {
         return (
             <div className="center">
-                <h2>Could not find a place!</h2>
+                <Card>Could not find a place!</Card>
             </div>
         );
     }
