@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useContext, useState } from 'react';
 
 import './Auth.css';
 import Input from '../../shared/components/FormElements/Input';
@@ -6,9 +6,12 @@ import { VALIDATOR_EMAIL, VALIDATOR_MINLENGTH, VALIDATOR_REQUIRE } from '../../s
 import Button from '../../shared/components/FormElements/Button';
 import { useForm } from '../../shared/hooks/form-hook';
 import Card from '../../shared/components/UIElements/Card';
-import { useState } from 'react';
+import { AuthContext } from '../../shared/context/auth-context';
 
 const Auth = () => {
+
+    //"importando" o context de auth
+    const auth = useContext(AuthContext);
 
     const [isLoginMode, setIsLoginMode] = useState(true);
 
@@ -62,6 +65,7 @@ const Auth = () => {
 
     const authSubmitHandler = event => {
         event.prevenDefault();
+        auth.login(); //acessa o método de login no App.js
     };
 
     //caso esteja no modo de Login, mostra o formulário de login e botao de trocar para signup
@@ -108,7 +112,7 @@ const Auth = () => {
                 </Button>
         </form>
         <Button inverse onClick={switchModeHandler}>
-          SWITCH TO {isLoginMode ? 'LOGIN' : 'SIGNUP'}
+          SWITCH TO {isLoginMode ? 'SIGNUP' : 'LOGIN'}
         </Button>
         </Card>
     );
