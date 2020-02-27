@@ -12,7 +12,7 @@ const formReducer = (state, action) => {
                 //se conter um input que estaja undefined, ele desconsidera o mesmo e passa
                 //pra próxima propriedade
                 if (!state.inputs[inputId]) {
-                    continue
+                    continue;
                 }
                 if ( inputId === action.inputId) {
                     formIsValid = formIsValid && action.isValid;

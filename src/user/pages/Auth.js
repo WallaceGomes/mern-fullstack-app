@@ -64,7 +64,7 @@ const Auth = () => {
     };
 
     const authSubmitHandler = event => {
-        event.prevenDefault();
+        event.preventDefault();
         auth.login(); //acessa o método de login no App.js
     };
 
@@ -76,23 +76,22 @@ const Auth = () => {
             <h2>{isLoginMode ? 'LOGIN' : 'SIGNUP'}</h2>
             <hr />
             <form className="auth-form" onSubmit={authSubmitHandler}>
-              {!isLoginMode && 
+              {!isLoginMode && (
                 <Input
                 id="name"
                 element="input"
-                label="name"
-                placeholder="Name"
+                label="Name"
                 type="text"
-                validators={[VALIDATOR_REQUIRE]}
+                validators={[VALIDATOR_REQUIRE()]}
                 errorText="Please enter a name"
                 onInput={inputHandler}
-                />}
+                />
+              )}
                 <Input
                 id="email"
                 element="input"
                 label="E-mail"
                 type="email"
-                placeholder="Email"
                 validators={[VALIDATOR_EMAIL()]}
                 onInput={inputHandler}
                 errorText="Please valid email address"
@@ -102,7 +101,6 @@ const Auth = () => {
                 element="input"
                 label="Password"
                 type="password"
-                placeholder="Password"
                 validators={[VALIDATOR_MINLENGTH(5)]}
                 onInput={inputHandler}
                 errorText="Password min 5 chars"
