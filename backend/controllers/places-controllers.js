@@ -52,7 +52,7 @@ exports.getPlaceByUserId = (req, res, next) => {
 };
 
 exports.createPlace = (req, res, next) => {
-    const{ title, description, coordinates, adress, creator } = req.body;
+    const { title, description, coordinates, adress, creator } = req.body;
     //const title = req.body.title
 
     const createdPlace = {
@@ -68,4 +68,26 @@ exports.createPlace = (req, res, next) => {
 
     //codigo default para algo novo criado no server com sucesso 201 - geral 200
     res.status(201).json({place: createdPlace});
+};
+
+exports.updatePlace = (req, res, next) => {
+    const { title, description} = req.body;
+
+    const placeId = req.params.pid; //url
+
+    //cria uma cópia do elemento do array com o id procurado
+    const updatedPlace = { ...TEST_PLACES.find(p => p.id === placeId) };
+    //pega a posição do elemento no array com o id procurado
+    const placeIndex = TEST_PLACES.findIndex(p => p.id === placeId);
+
+    updatedPlace.title = title;
+    updatedPlace.description = description;
+
+    TEST_PLACES[placeIndex] = updatedPlace;
+
+    res.status(200).json({place: updatedPlace})
+};
+
+exports.deletePlace = (req, res, next) => {
+
 };
