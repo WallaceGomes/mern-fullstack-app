@@ -1,3 +1,5 @@
+const uuid = require('uuid/v4'); //gera uma id de usuário única, checar depois
+
 const HttpError = require('../models/http-error');
 
 const TEST_PLACES = [
@@ -47,4 +49,23 @@ exports.getPlaceByUserId = (req, res, next) => {
     //qualquer dado enviado com esse método é convertido para json
     //standard success code 200
     res.json({place});
+};
+
+exports.createPlace = (req, res, next) => {
+    const{ title, description, coordinates, adress, creator } = req.body;
+    //const title = req.body.title
+
+    const createdPlace = {
+        id: uuid(),
+        title,
+        description,
+        location: coordinates,
+        adress,
+        creator
+    };
+
+    TEST_PLACES.push(createdPlace); //unshifit para posicionar [0]
+
+    //codigo default para algo novo criado no server com sucesso 201 - geral 200
+    res.status(201).json({place: createdPlace});
 };

@@ -1,15 +1,16 @@
 const express = require('express');
-//const bodyParser =  require('body-parser');
+const bodyParser =  require('body-parser');
 
 const placesRoutes = require('./routes/places-routes');
 
 const app = express();
 
+app.use(bodyParser.json());
+
 //permite o uso das rotas configuradas no respectivo arquivo de rotas
 //adicionando filtro no começo somente aceita caminhos começando com o filtro
 //pode haver mais variáveis após o filtro, mas não menos
 app.use('/api/places', placesRoutes); // /api/places/...
-
 
 //midleware para quando houver um erro
 // o express indentifica automaticamente quando há um erro em qualquer outro midleware

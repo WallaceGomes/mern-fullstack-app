@@ -13,4 +13,6 @@ router.get('/:pid', placesControllers.getPlaceById);
 //recebe um id de usuário e retorna os "places" do mesmo
 router.get('/user/:uid', placesControllers.getPlaceByUserId);
 
+router.post('/', placesControllers.createPlace);
+
 module.exports = router;
