@@ -11,7 +11,7 @@ const router = express.Router();
 router.get('/:pid', placesControllers.getPlaceById);
 
 //recebe um id de usuário e retorna os "places" do mesmo
-router.get('/user/:uid', placesControllers.getPlaceByUserId);
+router.get('/user/:uid', placesControllers.getPlacesByUserId);
 
 router.post('/', placesControllers.createPlace);
 

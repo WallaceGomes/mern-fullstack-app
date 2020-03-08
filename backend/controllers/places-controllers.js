@@ -2,7 +2,7 @@ const uuid = require('uuid/v4'); //gera uma id de usuário única, checar depois
 
 const HttpError = require('../models/http-error');
 
-const TEST_PLACES = [
+let TEST_PLACES = [
     {
         id: 'p1',
         title: 'Teste Empire Building',
@@ -34,21 +34,23 @@ exports.getPlaceById = (req, res, next) => {
     res.json({place}); // => {place} => {place: place}
 };
 
-exports.getPlaceByUserId = (req, res, next) => {
+exports.getPlacesByUserId = (req, res, next) => {
     const userId = req.params.uid;
-    const place = TEST_PLACES.find(u => {
+
+    //retorna todos os elementos do array que tem o id procurado
+    const places = TEST_PLACES.filter(u => {
         return u.creator === userId; 
     });
 
     //place => undefined
     //standard error code 404
-    if (!place) {
-        return next(new HttpError('Could not find a place for the ID!', 404)); //http-error model
+    if (!places || places.length === 0) {
+        return next(new HttpError('Could not find places for the ID!', 404)); //http-error model
     }
 
     //qualquer dado enviado com esse método é convertido para json
     //standard success code 200
-    res.json({place});
+    res.json({places});
 };
 
 exports.createPlace = (req, res, next) => {
@@ -90,4 +92,10 @@ exports.updatePlace = (req, res, next) => {
 
 exports.deletePlace = (req, res, next) => {
 
+    const placeId = req.params.pid; //url
+
+    //copia todos os elementos diferentes do plpaceId do array para o novo array
+    TEST_PLACES = TEST_PLACES.filter(p => p.id !== placeId);
+
+    res.status(200).json({message: 'Place deleted'});
 };
