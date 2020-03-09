@@ -4,6 +4,7 @@ const bodyParser =  require('body-parser');
 const HttpError = require('./models/http-error');
 
 const placesRoutes = require('./routes/places-routes');
+const usersRoutes = require('./routes/users-routes');
 
 const app = express();
 
@@ -13,6 +14,7 @@ app.use(bodyParser.json());
 //adicionando filtro no começo somente aceita caminhos começando com o filtro
 //pode haver mais variáveis após o filtro, mas não menos
 app.use('/api/places', placesRoutes); // /api/places/...
+app.use('/api/users', usersRoutes);
 
 //midleware para lidar com situações onde nenhuma rota anterior retorna um resposta
 //basicamente lida com requests que não queremos
