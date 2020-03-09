@@ -11,10 +11,12 @@ let USERS = [
     }
 ];
 
+//retorna todos os usuários
 exports.getUsers = (req, res, next) => {
     res.json({users: USERS});
 };
 
+//cadastra um novo usuário
 exports.signup = (req, res, next) => {
     const { name, email, password } = req.body;
 
@@ -37,6 +39,7 @@ exports.signup = (req, res, next) => {
     res.status(201).json({user: createdUser});
 };
 
+//login de usuário
 exports.login = (req, res, next) => {
     const { email, password } = req.body;
 
@@ -51,6 +54,7 @@ exports.login = (req, res, next) => {
     res.json({message: 'loged in'});;
 };
 
+//retorna um usuário específico
 exports.getUserById = (req, res, next) => {
     const userId = req.params.id;
 
@@ -84,6 +88,7 @@ exports.getUserById = (req, res, next) => {
 //     res.status(201).json({user: createdUser});
 // };
 
+//edita informações de um usuário patch
 exports.updateUser = (req, res, next) => {
     const { name, email, password } = req.body;
 
@@ -103,6 +108,7 @@ exports.updateUser = (req, res, next) => {
     res.status(200).json({place: updatedUser})
 };
 
+//deleta um usuário
 exports.deleteUser = (req, res, next) => {
 
     const userId = req.params.pid; //url
@@ -112,4 +118,3 @@ exports.deleteUser = (req, res, next) => {
 
     res.status(200).json({message: 'User deleted'});
 };
-
