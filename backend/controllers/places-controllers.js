@@ -87,6 +87,14 @@ exports.createPlace = (req, res, next) => {
 exports.updatePlace = (req, res, next) => {
     const { title, description} = req.body;
 
+    //verifica se há algum erro de validação baseado nas condições setadas nas rotas
+    //se houver algum erro, retorna na variável
+    //também pode conter várias informações detalhadas sobre o erro
+    const errors = validationResult(req);
+    if(!errors.isEmpty()){
+        throw new HttpError('Invalid inputs, check your data.', 422);
+    }
+
     const placeId = req.params.pid; //url
 
     //cria uma cópia do elemento do array com o id procurado

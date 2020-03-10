@@ -1,5 +1,9 @@
 const express = require('express');
 
+//check = função que checa se o parâmetro passado para validá-lo
+// de acordo com as funções executadas em seguida
+const { check } = require('express-validator');
+
 const usersControllers = require('../controllers/users-controllers');
 
 const router = express.Router();
@@ -11,7 +15,14 @@ const router = express.Router();
 
 router.get('/', usersControllers.getUsers);
 
-router.post('/signup', usersControllers.signup);
+router.post(
+    '/signup',
+    [
+        check('name').not().isEmpty(),
+        check('email').normalizeEmail().isEmail(), //Teste@teste.com => teste@teste.com
+        check('password').isLength({ min: 6 }),
+    ],
+    usersControllers.signup);
 
 router.post('/login', usersControllers.login);
 

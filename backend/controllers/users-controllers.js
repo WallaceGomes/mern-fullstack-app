@@ -1,5 +1,8 @@
 const uuid = require('uuid/v4'); //gera uma id de usuário única, checar depois
 
+//necessário para completar o processo de validação do input do front end
+const { validationResult } = require('express-validator');
+
 const HttpError = require('../models/http-error');
 
 let USERS = [
@@ -19,6 +22,14 @@ exports.getUsers = (req, res, next) => {
 //cadastra um novo usuário
 exports.signup = (req, res, next) => {
     const { name, email, password } = req.body;
+
+    //verifica se há algum erro de validação baseado nas condições setadas nas rotas
+    //se houver algum erro, retorna na variável
+    //também pode conter várias informações detalhadas sobre o erro
+    const errors = validationResult(req);
+    if(!errors.isEmpty()){
+        throw new HttpError('Invalid inputs, check your data.', 422);
+    }
 
     const hasUser = USERS.find(u => u.email === email);
 
