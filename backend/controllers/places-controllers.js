@@ -3,6 +3,8 @@ const uuid = require('uuid/v4'); //gera uma id de usuário única, checar depois
 //necessário para completar o processo de validação do input do front end
 const { validationResult } = require('express-validator');
 
+const getCoordsForAddress = require('../util/location');
+
 const HttpError = require('../models/http-error');
 
 let TEST_PLACES = [
@@ -56,25 +58,32 @@ exports.getPlacesByUserId = (req, res, next) => {
     res.json({places});
 };
 
-exports.createPlace = (req, res, next) => {
+exports.createPlace = async (req, res, next) => {
 
     //verifica se há algum erro de validação baseado nas condições setadas nas rotas
     //se houver algum erro, retorna na variável
     //também pode conter várias informações detalhadas sobre o erro
     const errors = validationResult(req);
     if(!errors.isEmpty()){
-        throw new HttpError('Invalid inputs, check your data.', 422);
+       return next(new HttpError('Invalid inputs, check your data.', 422));
     }
 
-    const { title, description, coordinates, adress, creator } = req.body;
+    const { title, description, address, creator } = req.body;
     //const title = req.body.title
+
+    let coordinates;
+    try {
+      coordinates = await getCoordsForAddress(address);
+    } catch (error) {
+      return next(error);
+    }
 
     const createdPlace = {
         id: uuid(),
         title,
         description,
         location: coordinates,
-        adress,
+        address,
         creator
     };
 
