@@ -1,4 +1,4 @@
-const uuid = require('uuid/v4'); //gera uma id de usuário única, checar depois
+//const uuid = require('uuid/v4'); //gera uma id de usuário única, checar depois
 
 //necessário para completar o processo de validação do input do front end
 const { validationResult } = require('express-validator');
@@ -6,6 +6,8 @@ const { validationResult } = require('express-validator');
 const getCoordsForAddress = require('../util/location');
 
 const HttpError = require('../models/http-error');
+
+const Place = require('../models/place');
 
 let TEST_PLACES = [
     {
@@ -78,16 +80,22 @@ exports.createPlace = async (req, res, next) => {
       return next(error);
     }
 
-    const createdPlace = {
-        id: uuid(),
+    const createdPlace = new Place({
         title,
         description,
-        location: coordinates,
         address,
+        location: coordinates,
+        image: 'https://media.gettyimages.com/photos/empire-state-building-at-sunset-picture-id171080501?s=612x612',
         creator
-    };
+    });
 
-    TEST_PLACES.push(createdPlace); //unshifit para posicionar [0]
+    //salva no banco de dados
+    try {
+        await createdPlace.save();
+    } catch (err) {
+        const error = new HttpError('Create place failed', 500);
+        return next(error); //retorna em caso de erro
+    }
 
     //codigo default para algo novo criado no server com sucesso 201 - geral 200
     res.status(201).json({place: createdPlace});
