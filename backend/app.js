@@ -1,5 +1,6 @@
 const express = require('express');
 const bodyParser =  require('body-parser');
+const mongoose = require('mongoose');
 
 const HttpError = require('./models/http-error');
 
@@ -39,4 +40,17 @@ app.use((error, req, res, next) => {
     res.json({message: error.message || 'An unknown error occurred!'})
 })
 
-app.listen(5000);
+//user: mernapp
+//pass: testmern
+// mongodb+srv://mernapp:testmern@clustermern-hwzsp.mongodb.net/test?retryWrites=true&w=majority
+
+//conexão com o banco de dados
+mongoose
+    .connect('mongodb+srv://mernapp:testmern@clustermern-hwzsp.mongodb.net/places?retryWrites=true&w=majority')
+    .then(() => { // conexão ok
+        app.listen(5000);
+    })
+    .catch(err => { // conexão falhou
+        console.log(err);
+    });
+
