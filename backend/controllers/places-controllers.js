@@ -121,7 +121,8 @@ exports.updatePlace = async (req, res, next) => {
     //também pode conter várias informações detalhadas sobre o erro
     const errors = validationResult(req);
     if(!errors.isEmpty()){
-        throw new HttpError('Invalid inputs, check your data.', 422);
+        return next(
+            new HttpError('Invalid inputs, check your data.', 422));
     }
 
     const { title, description} = req.body;

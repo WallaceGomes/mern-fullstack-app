@@ -1,9 +1,11 @@
-const uuid = require('uuid/v4'); //gera uma id de usuário única, checar depois
+//const uuid = require('uuid/v4'); //gera uma id de usuário única, checar depois
 
 //necessário para completar o processo de validação do input do front end
 const { validationResult } = require('express-validator');
 
 const HttpError = require('../models/http-error');
+
+const User = require('../models/user');
 
 let USERS = [
     {
@@ -20,34 +22,48 @@ exports.getUsers = (req, res, next) => {
 };
 
 //cadastra um novo usuário
-exports.signup = (req, res, next) => {
-    const { name, email, password } = req.body;
-
-    //verifica se há algum erro de validação baseado nas condições setadas nas rotas
+exports.signup = async (req, res, next) => {
+        //verifica se há algum erro de validação baseado nas condições setadas nas rotas
     //se houver algum erro, retorna na variável
     //também pode conter várias informações detalhadas sobre o erro
     const errors = validationResult(req);
     if(!errors.isEmpty()){
-        throw new HttpError('Invalid inputs, check your data.', 422);
+        return next (
+            new HttpError('Invalid inputs, check your data.', 422));
     }
 
-    const hasUser = USERS.find(u => u.email === email);
+    const { name, email, password, places } = req.body;
 
-    if(hasUser) {
-        throw new HttpError('User already exists', 422); // 422 invalid user input
+    let existingUser;
+    try{
+        existingUser = await User.findOne({email: email});
+    } catch (err) {
+        const error = new HttpError('Singn up failed', 500);
+        return next(error);
     }
 
-    const createdUser = {
-        id: uuid(),
-        name, //name: name
+    if(existingUser) {
+        const error = new HttpError('User exists already', 422);
+        return next(error);
+    }
+
+    const createdUser = new User ({
+        name,
         email,
-        password
-    };
+        image: 'https://avatars0.githubusercontent.com/u/43701494?s=460&u=6f9699f3b36c089cd98bc13bdf51d76223192c29&v=4',
+        password, //mais tarde adiconar encriptação (bcript?)
+        places
+    });
 
-    USERS.push(createdUser); //unshifit para posicionar [0]
+    try {
+        await createdUser.save();
+    } catch (err) {
+        const error = new HttpError('Signup failed', 500);
+        return next(error); //retorna em caso de erro
+    }
 
     //codigo default para algo novo criado no server com sucesso 201 - geral 200
-    res.status(201).json({user: createdUser});
+    res.status(201).json({user: createdUser.toObject({getters: true})});
 };
 
 //login de usuário
