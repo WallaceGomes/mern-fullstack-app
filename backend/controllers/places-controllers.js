@@ -9,19 +9,19 @@ const HttpError = require('../models/http-error');
 
 const Place = require('../models/place');
 
-let TEST_PLACES = [
-    {
-        id: 'p1',
-        title: 'Teste Empire Building',
-        description: 'Description test',
-        location: {
-            lat: 40.7484474,
-            lng: -73.9871516
-        },
-        address: 'Teste adress',
-        creator: 'u1'
-    }
-];
+// let TEST_PLACES = [
+//     {
+//         id: 'p1',
+//         title: 'Teste Empire Building',
+//         description: 'Description test',
+//         location: {
+//             lat: 40.7484474,
+//             lng: -73.9871516
+//         },
+//         address: 'Teste adress',
+//         creator: 'u1'
+//     }
+// ];
 
 exports.getPlaceById = async (req, res, next) => {
     const placeId = req.params.pid;
