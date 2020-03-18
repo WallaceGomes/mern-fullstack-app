@@ -67,18 +67,23 @@ exports.signup = async (req, res, next) => {
 };
 
 //login de usuário
-exports.login = (req, res, next) => {
+exports.login = async (req, res, next) => {
     const { email, password } = req.body;
 
-    const identifiedUser = USERS.find(u => {
-        return u.email === email
-    });
-
-    if(!identifiedUser || identifiedUser.password !== password) {
-        throw new HttpError('Could not identify user, email or password wrong', 401); // 401 autentication error
+    let existingUser;
+    try{//valida email
+        existingUser = await User.findOne({email: email});
+    } catch (err) {
+        const error = new HttpError('Login failed', 500);
+        return next(error);
     }
 
-    res.json({message: 'loged in'});;
+    if(!existingUser || existingUser.password !== password) {
+        const error = new HttpError('Invalid credentials', 401);
+        return next(error);
+    }
+
+    res.json({message: 'Loged in'});;
 };
 
 //retorna um usuário específico
