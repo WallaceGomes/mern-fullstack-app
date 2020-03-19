@@ -2,12 +2,14 @@
 
 //necessário para completar o processo de validação do input do front end
 const { validationResult } = require('express-validator');
+const mongoose = require('mongoose');
 
 const getCoordsForAddress = require('../util/location');
 
 const HttpError = require('../models/http-error');
 
 const Place = require('../models/place');
+const User = require('../models/user');
 
 // let TEST_PLACES = [
 //     {
@@ -102,9 +104,28 @@ exports.createPlace = async (req, res, next) => {
         creator
     });
 
-    //salva no banco de dados
+    let user;
+    try{//tenta retornar o id de usuário do BD
+        user = await User.findById(creator);
+    }catch (err) {
+        const error = new HttpError('Create place failed, could not find user', 500);
+        return next(error);
+    }
+
+    //usuário ok no BD 
+    if(!user) {
+        const error = new HttpError('Could not find user to the id', 404);
+        return next(error)
+    }
+
+    //salva no banco de dados usando sessions and trasactions
     try {
-        await createdPlace.save();
+        const sess = await mongoose.startSession();
+        sess.startTransaction();
+        await createdPlace.save({ session: sess });
+        user.places.push(createdPlace); //esse push é do mongoose e só adiciona o id do createdPlace
+        await user.save({ session: sess });
+        await sess.commitTransaction();
     } catch (err) {
         const error = new HttpError('Create place failed', 500);
         return next(error); //retorna em caso de erro
