@@ -17,8 +17,18 @@ let USERS = [
 ];
 
 //retorna todos os usuários
-exports.getUsers = (req, res, next) => {
-    res.json({users: USERS});
+exports.getUsers = async (req, res, next) => {
+
+    let users;
+    try {
+        users = await User.find({}, '-password'); //projection -> {} objeto, -pass retorna tudo menos o pass
+    }catch (err) {
+        const error = new HttpError('Could not find a user!', 500);
+        return next(error);
+    }
+
+    //nota: find retorna um array, por isso tem que usar map
+    res.json({users: users.map(user => user.toObject({getters: true}))});
 };
 
 //cadastra um novo usuário
