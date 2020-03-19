@@ -42,7 +42,7 @@ exports.signup = async (req, res, next) => {
             new HttpError('Invalid inputs, check your data.', 422));
     }
 
-    const { name, email, password, places } = req.body;
+    const { name, email, password } = req.body;
 
     let existingUser;
     try{
@@ -62,7 +62,7 @@ exports.signup = async (req, res, next) => {
         email,
         image: 'https://avatars0.githubusercontent.com/u/43701494?s=460&u=6f9699f3b36c089cd98bc13bdf51d76223192c29&v=4',
         password, //mais tarde adiconar encriptação (bcript?)
-        places
+        places: [] //quando cria o usuário é um array vazio e depois quando ele cria os "places" adiciona o id de cada um no array
     });
 
     try {

@@ -8,7 +8,7 @@ const userSchema = new Schema ({
     email: { type: String, required: true, unique: true}, //unique: não é um impedimento para haver dois emails iguais no DB, somente otimização
     password: { type: String, required: true, minlength: 6},
     image: { type: String, required: true},
-    places: { type: String, required: true}
+    places: [{ type: mongoose.Types.ObjectId, ref: 'Place', required: true}] //array pois aqui vai poder adicionar multiplos valores
 });
 
 userSchema.plugin(uniqueValidator); //aqui que valida se já tem um email igual cadastrado
