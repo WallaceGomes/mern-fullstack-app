@@ -63,8 +63,32 @@ const Auth = () => {
       //para prevenir mudanças extras desencessárias
     };
 
-    const authSubmitHandler = event => {
+    const authSubmitHandler = async event => {
         event.preventDefault();
+
+        if(isLoginMode) {
+
+        } else {
+          try{
+            const response = await fetch('http://localhost:5000/api/users/signup', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({
+                name: formState.inputs.name.value,
+                email: formState.inputs.email.value,
+                password: formState.inputs.password.value
+              })
+            }); //fetch api, api padrão do browser
+
+            const responseData = await response.json(); //a resposta não vem em json tem que usar o parser
+            console.log(responseData);
+          } catch (err) {
+            console.log(err);
+          }
+        }
+
         auth.login(); //acessa o método de login no App.js
     };
 
@@ -105,7 +129,7 @@ const Auth = () => {
                 onInput={inputHandler}
                 errorText="Password min 5 chars"
                 />
-                <Button type="submit" disable={!formState.isValid} >
+                <Button type="submit" disabled={!formState.isValid} >
                     {isLoginMode ? 'LOGIN' : 'SIGNUP'}
                 </Button>
         </form>

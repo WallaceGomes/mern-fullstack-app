@@ -11,6 +11,16 @@ const app = express();
 
 app.use(bodyParser.json());
 
+app.use((req, res, next) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader(
+        'Access-Control-Allow-Headers',
+        'Origin, X-Requested-With, Content-Type, Accept, Authorization'
+    );
+    res.setHeader('Acces-Control-Allow-Methods', 'GET, POST, PATCH, DELETE');
+    next();
+});
+
 //permite o uso das rotas configuradas no respectivo arquivo de rotas
 //adicionando filtro no começo somente aceita caminhos começando com o filtro
 //pode haver mais variáveis após o filtro, mas não menos
@@ -46,7 +56,7 @@ app.use((error, req, res, next) => {
 
 //conexão com o banco de dados
 mongoose
-    .connect('mongodb+srv://mernapp:testmern@clustermern-hwzsp.mongodb.net/places?retryWrites=true&w=majority')
+    .connect('mongodb+srv://mernapp:testmern@clustermern-hwzsp.mongodb.net/mern?retryWrites=true&w=majority')
     .then(() => { // conexão ok
         app.listen(5000);
     })

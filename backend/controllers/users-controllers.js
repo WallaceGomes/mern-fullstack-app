@@ -38,7 +38,7 @@ exports.signup = async (req, res, next) => {
     //também pode conter várias informações detalhadas sobre o erro
     const errors = validationResult(req);
     if(!errors.isEmpty()){
-        return next (
+        return next(
             new HttpError('Invalid inputs, check your data.', 422));
     }
 
