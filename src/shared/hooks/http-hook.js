@@ -1,5 +1,4 @@
-import { useState, useCallback, useRef } from 'react';
-import { useEffect } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 
 export const useHttpClient = () => {
     const [isLoading, setIsLoading] = useState(false);
@@ -9,12 +8,8 @@ export const useHttpClient = () => {
 
     //useCallback = evitar que essa função seja recriada toda vez que um component
     // que utiliza este hook rerender 
-    const sendRequest = useCallback(async (
-        url,
-        method = 'GET',
-        body= null,
-        headers = {}
-        ) => {
+    const sendRequest = useCallback(
+        async (url, method = 'GET', body= null, headers = {}) => {
         setIsLoading(true);
         
         //caso o usuário realise alguma ação inesperada durante a aperação
@@ -29,17 +24,24 @@ export const useHttpClient = () => {
                 signal: httpAbortCtrl.signal
             });
     
-            const responseData = response.json();
+            const responseData = await response.json();
+
+            activeHttpRequests.current = activeHttpRequests.current.filter(
+                reqCtrl => reqCtrl !== httpAbortCtrl
+            );
     
             if(!response.ok){
                 throw new Error(responseData.message);
             }
-
+            setIsLoading(false);
             return responseData;
         }catch (err){
             setError(err.message);
+            setIsLoading(false);
+            //caso ocorra algum erro precisa do throw para sair
+            // se não vai continuar a lógica no componente
+            throw err;
         }
-        setIsLoading(false);
     }, []);
 
     const clearError = () => {
@@ -49,10 +51,10 @@ export const useHttpClient = () => {
     //useEffect também pode ser usado no unmount do componente
     useEffect(() => {
         return () => {
-            // eslint-disable-next-line react-hooks/exhaustive-deps
-            activeHttpRequests.current.forEach(abortCtrl => abortCtrl.abort());
+          // eslint-disable-next-line react-hooks/exhaustive-deps
+          activeHttpRequests.current.forEach(abortCtrl => abortCtrl.abort());
         };
-    }, []);
+      }, []);
 
-    return { isLoading, error, sendRequest, clearError }
+    return { isLoading, error, sendRequest, clearError };
 };

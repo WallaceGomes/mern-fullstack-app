@@ -7,6 +7,7 @@ import Button from '../../shared/components/FormElements/Button';
 import LoadingSpiner from '../../shared/components/UIElements/LoadingSpinner';
 import ErrorModal from '../../shared/components/UIElements/ErrorModal';
 import { useForm } from '../../shared/hooks/form-hook';
+import { useHttpClient } from '../../shared/hooks/http-hook';
 import Card from '../../shared/components/UIElements/Card';
 import { AuthContext } from '../../shared/context/auth-context';
 
@@ -16,8 +17,7 @@ const Auth = () => {
     const auth = useContext(AuthContext);
 
     const [isLoginMode, setIsLoginMode] = useState(true);
-    const [isLoading, setIsLoading] = useState(false);
-    const [error, setError] = useState();
+    const { isLoading, error, sendRequest, clearError } = useHttpClient();
  
     const [formState, inputHandler, setFormData] = useForm({
       email: {
@@ -70,75 +70,48 @@ const Auth = () => {
     const authSubmitHandler = async event => {
         event.preventDefault();
         
-        setIsLoading(true);
         if(isLoginMode) {
           try{
-            const response = await fetch('http://localhost:5000/api/users/login', {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json'
-              },
-              body: JSON.stringify({
+            await sendRequest(
+              'http://localhost:5000/api/users/login',
+              'POST',
+              JSON.stringify({
                 email: formState.inputs.email.value,
                 password: formState.inputs.password.value
-              })
-            }); //fetch api, api padrão do browser
-            //se usar fetch, a resposta não vem em json tem que usar o parser 
-            const responseData = await response.json();
-            //uma resposta é ok se for do tipo 200
-            //respostas com mensagem 400 ou 500 não são ok logo serão tratados como erro aqui
-            if(!response.ok) {
-              throw new Error(responseData.message);//vai pro catch
-            }
-            setIsLoading(false);
+              }),
+              {
+                'Content-Type': 'application/json'
+              }
+            );
             auth.login(); //acessa o método de login no App.js
           } catch (err) {
-            setIsLoading(false);
-            setError(err.message || 'Something went wrong, please try again.');
           }
         } else {
           try{
-            const response = await fetch('http://localhost:5000/api/users/signup', {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json'
-              },
-              body: JSON.stringify({
+            await sendRequest(
+              'http://localhost:5000/api/users/signup',
+              'POST',
+              JSON.stringify({
                 name: formState.inputs.name.value,
                 email: formState.inputs.email.value,
                 password: formState.inputs.password.value
-              })
-            }); //fetch api, api padrão do browser
-            //se usar fetch, a resposta não vem em json tem que usar o parser 
-            const responseData = await response.json();
-            //uma resposta é ok se for do tipo 200
-            //respostas com mensagem 400 ou 500 não são ok logo serão tratados como erro aqui
-            if(!response.ok) {
-              throw new Error(responseData.message);//vai pro catch
-            }
-
-            console.log(responseData);
-            setIsLoading(false);
+              }),
+              {
+                'Content-Type': 'application/json'
+              }
+            );
             auth.login(); //acessa o método de login no App.js
           } catch (err) {
-            console.log(err);
-            setIsLoading(false);
-            setError(err.message || 'Something went wrong, please try again.');
           }
         }
     };
-
-
-    const errorHandler = () => {
-      setError(null);
-    }
 
     //caso esteja no modo de Login, mostra o formulário de login e botao de trocar para signup
     //caso esteja no mode de signup, mostra o formulário de signup e botão de trocar para login
     //{isLoginMode ? 'LOGIN' : 'SIGNUP'} => operador ternário > {condição ? true : false}
     return (
       <React.Fragment>
-        <ErrorModal error={error} onClear={errorHandler} />
+        <ErrorModal error={error} onClear={clearError} />
         <Card className="authentication">
           {isLoading && <LoadingSpiner asOverlay/>}
             <h2>{isLoginMode ? 'LOGIN' : 'SIGNUP'}</h2>
