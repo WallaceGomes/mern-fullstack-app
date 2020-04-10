@@ -48,7 +48,7 @@ exports.signup = async (req, res, next) => {
     try{
         existingUser = await User.findOne({email: email});
     } catch (err) {
-        const error = new HttpError('Singn up failed', 500);
+        const error = new HttpError('Singn up failed, conection error', 500);
         return next(error);
     }
 

@@ -4,6 +4,8 @@ import './Auth.css';
 import Input from '../../shared/components/FormElements/Input';
 import { VALIDATOR_EMAIL, VALIDATOR_MINLENGTH, VALIDATOR_REQUIRE } from '../../shared/util/validators';
 import Button from '../../shared/components/FormElements/Button';
+import LoadingSpiner from '../../shared/components/UIElements/LoadingSpinner';
+import ErrorModal from '../../shared/components/UIElements/ErrorModal';
 import { useForm } from '../../shared/hooks/form-hook';
 import Card from '../../shared/components/UIElements/Card';
 import { AuthContext } from '../../shared/context/auth-context';
@@ -14,7 +16,9 @@ const Auth = () => {
     const auth = useContext(AuthContext);
 
     const [isLoginMode, setIsLoginMode] = useState(true);
-
+    const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState();
+ 
     const [formState, inputHandler, setFormData] = useForm({
       email: {
         value: '',
@@ -65,11 +69,12 @@ const Auth = () => {
 
     const authSubmitHandler = async event => {
         event.preventDefault();
-
+        
         if(isLoginMode) {
 
         } else {
           try{
+            setIsLoading(true);
             const response = await fetch('http://localhost:5000/api/users/signup', {
               method: 'POST',
               headers: {
@@ -81,22 +86,38 @@ const Auth = () => {
                 password: formState.inputs.password.value
               })
             }); //fetch api, api padrão do browser
+            //se usar fetch, a resposta não vem em json tem que usar o parser 
+            const responseData = await response.json();
+            //uma resposta é ok se for do tipo 200
+            //respostas com mensagem 400 ou 500 não são ok logo serão tratados como erro aqui
+            if(!response.ok) {
+              throw new Error(responseData.message);//vai pro catch
+            }
 
-            const responseData = await response.json(); //a resposta não vem em json tem que usar o parser
             console.log(responseData);
+            setIsLoading(false);
+            auth.login(); //acessa o método de login no App.js
           } catch (err) {
             console.log(err);
+            setIsLoading(false);
+            setError(err.message || 'Something webt wrong, please try again.');
           }
         }
-
-        auth.login(); //acessa o método de login no App.js
     };
+
+
+    const errorHandler = () => {
+      setError(null);
+    }
 
     //caso esteja no modo de Login, mostra o formulário de login e botao de trocar para signup
     //caso esteja no mode de signup, mostra o formulário de signup e botão de trocar para login
     //{isLoginMode ? 'LOGIN' : 'SIGNUP'} => operador ternário > {condição ? true : false}
     return (
+      <React.Fragment>
+        <ErrorModal error={error} onClear={errorHandler} />
         <Card className="authentication">
+          {isLoading && <LoadingSpiner asOverlay/>}
             <h2>{isLoginMode ? 'LOGIN' : 'SIGNUP'}</h2>
             <hr />
             <form className="auth-form" onSubmit={authSubmitHandler}>
@@ -137,6 +158,7 @@ const Auth = () => {
           SWITCH TO {isLoginMode ? 'SIGNUP' : 'LOGIN'}
         </Button>
         </Card>
+      </React.Fragment>
     );
 
 };
