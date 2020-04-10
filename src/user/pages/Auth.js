@@ -70,11 +70,34 @@ const Auth = () => {
     const authSubmitHandler = async event => {
         event.preventDefault();
         
+        setIsLoading(true);
         if(isLoginMode) {
-
+          try{
+            const response = await fetch('http://localhost:5000/api/users/login', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({
+                email: formState.inputs.email.value,
+                password: formState.inputs.password.value
+              })
+            }); //fetch api, api padrão do browser
+            //se usar fetch, a resposta não vem em json tem que usar o parser 
+            const responseData = await response.json();
+            //uma resposta é ok se for do tipo 200
+            //respostas com mensagem 400 ou 500 não são ok logo serão tratados como erro aqui
+            if(!response.ok) {
+              throw new Error(responseData.message);//vai pro catch
+            }
+            setIsLoading(false);
+            auth.login(); //acessa o método de login no App.js
+          } catch (err) {
+            setIsLoading(false);
+            setError(err.message || 'Something went wrong, please try again.');
+          }
         } else {
           try{
-            setIsLoading(true);
             const response = await fetch('http://localhost:5000/api/users/signup', {
               method: 'POST',
               headers: {
@@ -100,7 +123,7 @@ const Auth = () => {
           } catch (err) {
             console.log(err);
             setIsLoading(false);
-            setError(err.message || 'Something webt wrong, please try again.');
+            setError(err.message || 'Something went wrong, please try again.');
           }
         }
     };
