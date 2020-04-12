@@ -8,6 +8,7 @@ import { createContext } from "react";
 //  Este component será responsável por guardar se o usuário está logado ou não
 export const AuthContext = createContext({
     isLoggedIn: false,
+    userId: null,
     login: () => {},
     logout: () => {}
 });

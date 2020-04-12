@@ -1,13 +1,21 @@
-import React from 'react';
+import React, { useContext } from 'react';
+import { useHistory } from 'react-router-dom';
 import Input from '../../shared/components/FormElements/Input';
 import Button from '../../shared/components/FormElements/Button';
 
 import { VALIDATOR_REQUIRE, VALIDATOR_MINLENGTH } from '../../shared/util/validators';
+import { AuthContext } from '../../shared/context/auth-context';
+import { useHttpClient } from '../../shared/hooks/http-hook';
+import { useForm } from '../../shared/hooks/form-hook';
+import LoadingSpiner from '../../shared/components/UIElements/LoadingSpinner';
+import ErrorModal from '../../shared/components/UIElements/ErrorModal';
 
 import './PlaceForm.css';
-import { useForm } from '../../shared/hooks/form-hook';
 
 const NewPlace = () => {
+
+    const auth = useContext(AuthContext);
+    const { isLoading, error, sendRequest, clearError } = useHttpClient();
 
     const [formState, inputHandler] = useForm({
         title: {
@@ -24,13 +32,32 @@ const NewPlace = () => {
         }
     }, false);
 
-    const placeSubmitHandler = event => {
+    const history = useHistory();
+
+    const placeSubmitHandler = async event => {
         event.preventDefault();
-        console.log(formState.inputs); //aqui que vai enviar pro backend
+        try{
+            await sendRequest(
+                'http://localhost:5000/api/places',
+                'POST',
+                JSON.stringify({
+                    title: formState.inputs.title.value,
+                    description: formState.inputs.description.value,
+                    address: formState.inputs.address.value,
+                    creator: auth.userId
+                }),
+                { 'Content-Type': 'application/json'}
+            );
+            history.push('/'); //redireciona para o início após o login
+        }catch (err) {}
+
     };
 
     return (
-        <form className="place-form" onSubmit={placeSubmitHandler}>
+        <React.Fragment>
+            <ErrorModal error={error} onClear={clearError} />
+            <form className="place-form" onSubmit={placeSubmitHandler}>
+            {isLoading && <LoadingSpiner asOverlay/>}
             <Input 
             id="title"
             element="input"
@@ -59,6 +86,7 @@ const NewPlace = () => {
                 ADD PLACE
             </Button>
         </form>
+        </React.Fragment>
     );
 };
 

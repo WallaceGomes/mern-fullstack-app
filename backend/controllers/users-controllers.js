@@ -93,7 +93,7 @@ exports.login = async (req, res, next) => {
         return next(error);
     }
 
-    res.json({message: 'Loged in'});;
+    res.json({message: 'Loged in', user: existingUser.toObject({getters: true})});
 };
 
 //retorna um usuário específico

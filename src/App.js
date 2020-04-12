@@ -16,15 +16,17 @@ import { AuthContext } from './shared/context/auth-context';
 const App = () => {
 
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-
+  const [userId, setUserID] = useState(false);
   //necessário utilizar o useCallback para evitar a criação de novas funções e loops infinitos
   //sem dependências pois esta função não precisará ser recriada
-  const login = useCallback(() => {
+  const login = useCallback((uid) => {
     setIsLoggedIn(true);
+    setUserID(uid);
   },[]);
 
   const logout = useCallback(() => {
     setIsLoggedIn(false);
+    setUserID(null);
   },[]);
 
   let routes;
@@ -73,7 +75,12 @@ const App = () => {
   */
   return (
     <AuthContext.Provider
-    value={{ isLoggedIn: isLoggedIn, login: login, logout: logout }}
+    value={{
+      isLoggedIn: isLoggedIn,
+      userId: userId,
+      login: login,
+      logout: logout
+    }}
     >
       <Router>
         <MainNavigation/>
