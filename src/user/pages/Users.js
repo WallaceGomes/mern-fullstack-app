@@ -2,12 +2,11 @@ import React, { useEffect, useState } from 'react';
 import UsersList from '../components/UsersList';
 import ErrorModal from '../../shared/components/UIElements/ErrorModal';
 import LoadingSpinner from '../../shared/components/UIElements/LoadingSpinner';
-
+import { useHttpClient } from '../../shared/hooks/http-hook';
 
 const Users = () => {
 
-    const [isLoading, setIsLoading] = useState(false);
-    const [error, setError] = useState();
+    const { isLoading, error, sendRequest, clearError } = useHttpClient();
     const [loadedUsers, setLoadedUsers] = useState();
 
     //por padrão o fetch já é um get
@@ -15,36 +14,26 @@ const Users = () => {
     //NOTA: Não é uma boa prática utilizar async no useEffect
     //caso utilize uma promisse, fazer usso de uma função para isso
     useEffect(() => {
-        const sendRequest = async () => {
-            setIsLoading(true);
+
+        const fetchUsers = async () => {
+            
             try{
-                const response = await fetch('http://localhost:5000/api/users');
-
-                //tem que usar o parser pois não vem json por padrão
-                const responseData = await response.json();
-
-                //uma resposta é ok se for do tipo 200
-                //respostas com mensagem 400 ou 500 não são ok logo serão tratados como erro aqui
-                if(!response.ok) {
-                    throw new Error(responseData.message);//vai pro catch
-                }
+                //para uma operção get, não é necessário enviar mais nada por aqui
+                // o hook já está configurado com valores padrões
+                const responseData = await sendRequest(
+                    'http://localhost:5000/api/users'
+                );
 
                 setLoadedUsers(responseData.users);
             }catch(err) {
-                setError(err.message);
             }
-            setIsLoading(false);
         }
-        sendRequest();
-    }, []);
-
-    const errorHandler = () => {
-        setError(null);
-    }
+        fetchUsers();
+    }, [sendRequest]);
 
     return (
         <React.Fragment>
-            <ErrorModal error={error} onClear={errorHandler} />
+            <ErrorModal error={error} onClear={clearError} />
             {isLoading && (
                 <div className="center" >
                     <LoadingSpinner/>
