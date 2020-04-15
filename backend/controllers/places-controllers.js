@@ -192,7 +192,7 @@ exports.deletePlace = async (req, res, next) => {
     try {
         const sess = await mongoose.startSession();
         sess.startTransaction();
-        await place.remove()({ session: sess });
+        await place.remove({ session: sess });
         place.creator.places.pull(place); //esse pull é do mongoose e só remove o id do user
         await place.creator.save({ session: sess });
         await sess.commitTransaction();
