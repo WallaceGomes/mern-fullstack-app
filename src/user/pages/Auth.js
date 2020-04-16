@@ -6,6 +6,7 @@ import { VALIDATOR_EMAIL, VALIDATOR_MINLENGTH, VALIDATOR_REQUIRE } from '../../s
 import Button from '../../shared/components/FormElements/Button';
 import LoadingSpiner from '../../shared/components/UIElements/LoadingSpinner';
 import ErrorModal from '../../shared/components/UIElements/ErrorModal';
+import ImageUpload from '../../shared/components/FormElements/ImageUpload';
 import { useForm } from '../../shared/hooks/form-hook';
 import { useHttpClient } from '../../shared/hooks/http-hook';
 import Card from '../../shared/components/UIElements/Card';
@@ -128,6 +129,7 @@ const Auth = () => {
                 onInput={inputHandler}
                 />
               )}
+              {!isLoginMode && <ImageUpload id="image" center />}
                 <Input
                 id="email"
                 element="input"
