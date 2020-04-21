@@ -43,7 +43,8 @@ const Auth = () => {
             ...formState.inputs, //copia tudo que está no state do form
             //seta o nome para undefined mas ele ainda vai ser considerado no state do form
             //para isso nao acontecer tem que desconsiderar ele no form-hook
-            name: undefined
+            name: undefined,
+            image: undefined
           },
           //checa a validade dos outros campos
           formState.inputs.email.isValid && formState.inputs.password.isValid
@@ -58,6 +59,10 @@ const Auth = () => {
             name: { //inclui o novo campo de nome no state, inicialmente vazio e inválido
               value: '',
               isValid: false
+            },
+            image: {
+              value: null,
+              isValid: false
             }
           }, 
           false);
@@ -70,6 +75,8 @@ const Auth = () => {
 
     const authSubmitHandler = async event => {
         event.preventDefault();
+
+        console.log(formState.inputs);
         
         if(isLoginMode) {
           try{
@@ -129,7 +136,7 @@ const Auth = () => {
                 onInput={inputHandler}
                 />
               )}
-              {!isLoginMode && <ImageUpload id="image" center />}
+              {!isLoginMode && <ImageUpload id="image" center errorText="Invalid uploaded image." onInput={inputHandler} />}
                 <Input
                 id="email"
                 element="input"
