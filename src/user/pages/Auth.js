@@ -76,7 +76,7 @@ const Auth = () => {
     const authSubmitHandler = async event => {
         event.preventDefault();
 
-        console.log(formState.inputs);
+        //console.log(formState.inputs);
         
         if(isLoginMode) {
           try{
@@ -96,17 +96,15 @@ const Auth = () => {
           }
         } else {
           try{
+            const formData = new FormData(); //FormData = used to send diferent data types through request
+            formData.append('email', formState.inputs.email.value);
+            formData.append('name', formState.inputs.name.value);
+            formData.append('password', formState.inputs.password.value);
+            formData.append('image', formState.inputs.image.value);
             const responseData = await sendRequest(
               'http://localhost:5000/api/users/signup',
               'POST',
-              JSON.stringify({
-                name: formState.inputs.name.value,
-                email: formState.inputs.email.value,
-                password: formState.inputs.password.value
-              }),
-              {
-                'Content-Type': 'application/json'
-              }
+              formData
             );
             auth.login(responseData.user.id); //acessa o método de login no App.js
           } catch (err) {

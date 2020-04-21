@@ -60,7 +60,7 @@ exports.signup = async (req, res, next) => {
     const createdUser = new User ({
         name,
         email,
-        image: 'https://avatars0.githubusercontent.com/u/43701494?s=460&u=6f9699f3b36c089cd98bc13bdf51d76223192c29&v=4',
+        image: req.file.path,
         password, //mais tarde adiconar encriptação (bcript?)
         places: [] //quando cria o usuário é um array vazio e depois quando ele cria os "places" adiciona o id de cada um no array
     });
