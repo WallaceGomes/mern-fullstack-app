@@ -1,5 +1,5 @@
 //const uuid = require('uuid/v4'); //gera uma id de usuário única, checar depois
-
+const fs = require('fs');
 //necessário para completar o processo de validação do input do front end
 const { validationResult } = require('express-validator');
 const mongoose = require('mongoose');
@@ -189,6 +189,8 @@ exports.deletePlace = async (req, res, next) => {
         return next(error);
     }
 
+    const imagePath = place.image;
+
     try {
         const sess = await mongoose.startSession();
         sess.startTransaction();
@@ -199,6 +201,12 @@ exports.deletePlace = async (req, res, next) => {
     } catch (err) {
         const error = new HttpError('Remove a place failed', 500);
         return next(error); //retorna em caso de erro
+    }
+
+    if (imagePath) {
+        fs.unlink(imagePath, err => {
+            console.log(err);
+        });
     }
 
     res.status(200).json({message: 'Place deleted'});
