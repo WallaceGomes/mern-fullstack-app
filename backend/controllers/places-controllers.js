@@ -100,7 +100,7 @@ exports.createPlace = async (req, res, next) => {
         description,
         address,
         location: coordinates,
-        image: 'https://media.gettyimages.com/photos/empire-state-building-at-sunset-picture-id171080501?s=612x612',
+        image: req.file.path,
         creator
     });
 
