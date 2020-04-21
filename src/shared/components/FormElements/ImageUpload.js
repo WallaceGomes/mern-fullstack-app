@@ -17,7 +17,9 @@ const ImageUpload = props => {
 
     return (
         <div className="form-control" >
-            <input id={props.id}
+            <input
+            id={props.id}
+            ref={filePickerRef}
             style={{ display: 'none'} }
             type="file"
             accept=".jpg, .png, .jpeg"
