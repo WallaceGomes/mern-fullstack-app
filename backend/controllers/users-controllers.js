@@ -2,6 +2,7 @@
 
 //necessário para completar o processo de validação do input do front end
 const { validationResult } = require('express-validator');
+const bcrypt = require('bcryptjs');
 
 const HttpError = require('../models/http-error');
 
@@ -57,11 +58,22 @@ exports.signup = async (req, res, next) => {
         return next(error);
     }
 
+    let hashedPassword;
+    try{
+        hashedPassword = await bcrypt.hash(password, 12);
+    }catch(err) {
+        const error = new HttpError(
+            'Could not create user, try again.(server hash)',
+            500
+        );
+        return next(error);
+    }
+
     const createdUser = new User ({
         name,
         email,
         image: req.file.path,
-        password, //mais tarde adiconar encriptação (bcript?)
+        password: hashedPassword, //bcrypt
         places: [] //quando cria o usuário é um array vazio e depois quando ele cria os "places" adiciona o id de cada um no array
     });
 
@@ -84,12 +96,37 @@ exports.login = async (req, res, next) => {
     try{//valida email
         existingUser = await User.findOne({email: email});
     } catch (err) {
-        const error = new HttpError('Login failed', 500);
+        const error = new HttpError(
+            'Login failed',
+            500
+        );
         return next(error);
     }
 
-    if(!existingUser || existingUser.password !== password) {
-        const error = new HttpError('Invalid credentials', 401);
+    if(!existingUser) {
+        const error = new HttpError(
+            'Invalid credentials',
+            401
+        );
+        return next(error);
+    }
+
+    let isValidPassword = false;
+    try{
+        isValidPassword = await bcrypt.compare(password, existingUser.password);
+    }catch(err){
+        const error = new HttpError(
+            'Could not login, brypt error',
+            401
+        );
+        return next(error);
+    }
+    
+    if(!isValidPassword) {
+        const error = new HttpError(
+            'Invalid credentials',
+            401
+        );
         return next(error);
     }
 
