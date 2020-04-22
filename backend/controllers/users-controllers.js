@@ -3,19 +3,11 @@
 //necessário para completar o processo de validação do input do front end
 const { validationResult } = require('express-validator');
 const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 
 const HttpError = require('../models/http-error');
 
 const User = require('../models/user');
-
-let USERS = [
-    {
-    id: 'u1',
-    name: 'Wallace Gomes',
-    email: 'teste@teste.com',
-    password: 'testeteste'
-    }
-];
 
 //retorna todos os usuários
 exports.getUsers = async (req, res, next) => {
@@ -84,8 +76,28 @@ exports.signup = async (req, res, next) => {
         return next(error); //retorna em caso de erro
     }
 
+    let token;
+    try{
+        token = jwt.sign(
+            { userId: createdUser.id, email: createdUser.email },
+            'palaversercretajwt',
+            { expiresIn: '12h' }
+        );
+    }catch(err) {
+        const error = new HttpError(
+            'Signup failed',
+            500
+        );
+        return next(error);
+    }
+
     //codigo default para algo novo criado no server com sucesso 201 - geral 200
-    res.status(201).json({user: createdUser.toObject({getters: true})});
+    res.status(201)
+    .json({
+        userId: createdUser.id,
+        email: createdUser.email,
+        token: token
+    });
 };
 
 //login de usuário
@@ -121,7 +133,7 @@ exports.login = async (req, res, next) => {
         );
         return next(error);
     }
-    
+
     if(!isValidPassword) {
         const error = new HttpError(
             'Invalid credentials',
@@ -130,70 +142,72 @@ exports.login = async (req, res, next) => {
         return next(error);
     }
 
-    res.json({message: 'Loged in', user: existingUser.toObject({getters: true})});
+    let token;
+    try{
+        token = jwt.sign(
+            { userId: existingUser.id, email: existingUser.email },
+            'palaversercretajwt',
+            { expiresIn: '12h' }
+        );
+    }catch(err) {
+        const error = new HttpError(
+            'Login failed',
+            500
+        );
+        return next(error);
+    }
+
+    res.json({
+        userId: existingUser.id,
+        email: existingUser.email,
+        token: token
+    });
 };
 
 //retorna um usuário específico
-exports.getUserById = (req, res, next) => {
-    const userId = req.params.id;
+// exports.getUserById = (req, res, next) => {
+//     const userId = req.params.id;
 
-    const user = USERS.find(u => {
-        return u.id === userId;
-    });
+//     const user = User.find(u => {
+//         return u.id === userId;
+//     });
 
-    if (!user) {
-        throw new HttpError('Could not find a place for the ID!', 404); //http-error model
-        // aqui não precisa return pois já cancela a execução da função
-    }
+//     if (!user) {
+//         throw new HttpError('Could not find a place for the ID!', 404); //http-error model
+//         // aqui não precisa return pois já cancela a execução da função
+//     }
 
-    //standard success code 200
-    res.json({user}); // => {place} => {place: place}
-};
-
-// exports.createUser = (req, res, next) => {
-//     const { name, email, password } = req.body;
-//     //const title = req.body.title
-
-//     const createdUser = {
-//         id: uuid(),
-//         name,
-//         email,
-//         password
-//     };
-
-//     USERS.push(createdUser); //unshifit para posicionar [0]
-
-//     //codigo default para algo novo criado no server com sucesso 201 - geral 200
-//     res.status(201).json({user: createdUser});
+//     //standard success code 200
+//     res.json({user}); // => {place} => {place: place}
 // };
 
 //edita informações de um usuário patch
-exports.updateUser = (req, res, next) => {
-    const { name, email, password } = req.body;
+// exports.updateUser = (req, res, next) => {
+//     const { name, email, password } = req.body;
 
-    const userId = req.params.uid; //url
+//     const userId = req.params.uid; //url
 
-    //cria uma cópia do elemento do array com o id procurado
-    const updatedUser = { ...USERS.find(u => u.id === userId) };
-    //pega a posição do elemento no array com o id procurado
-    const userIndex = USERS.findIndex(u => u.id === userId);
+//     //cria uma cópia do elemento do array com o id procurado
+//     const updatedUser = { ...User.find(u => u.id === userId) };
+//     //pega a posição do elemento no array com o id procurado
+//     const userIndex = User.findIndex(u => u.id === userId);
 
-    updatedUser.name = name;
-    updatedUser.email = email;
-    updatedUser.password = password;
+//     updatedUser.name = name;
+//     updatedUser.email = email;
+//     updatedUser.password = password;
 
-    USERS[userIndex] = updatedUser;
+//     User[userIndex] = updatedUser;
 
-    res.status(200).json({place: updatedUser})
-};
+//     res.status(200).json({place: updatedUser})
+// };
 
 //deleta um usuário
-exports.deleteUser = (req, res, next) => {
+// exports.deleteUser = (req, res, next) => {
 
-    const userId = req.params.pid; //url
+//     const userId = req.params.pid; //url
 
-    //copia todos os elementos diferentes do userId do array para o novo array
-    USERS = USERS.filter(u => u.id !== userId);
+//     //copia todos os elementos diferentes do userId do array para o novo array
+//     User = User.filter(u => u.id !== userId);
 
-    res.status(200).json({message: 'User deleted'});
-};
+//     res.status(200).json({message: 'User deleted'});
+// };
