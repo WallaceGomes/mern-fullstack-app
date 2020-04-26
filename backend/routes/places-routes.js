@@ -6,6 +6,7 @@ const { check } = require('express-validator');
 const fileUpload = require('../middleware/file-upload');
 
 const placesControllers = require('../controllers/places-controllers');
+const checkAuth = require('../middleware/check-auth');
 
 const router = express.Router();
 
@@ -17,6 +18,8 @@ router.get('/:pid', placesControllers.getPlaceById);
 
 //recebe um id de usuário e retorna os "places" do mesmo
 router.get('/user/:uid', placesControllers.getPlacesByUserId);
+
+router.use(checkAuth);
 
 router.post(
     '/',
