@@ -91,7 +91,7 @@ const Auth = () => {
                 'Content-Type': 'application/json'
               }
             );
-            auth.login(responseData.user.id); //acessa o método de login no App.js
+            auth.login(responseData.userId, responseData.token); //acessa o método de login no App.js
           } catch (err) {
           }
         } else {
@@ -106,7 +106,7 @@ const Auth = () => {
               'POST',
               formData
             );
-            auth.login(responseData.user.id); //acessa o método de login no App.js
+            auth.login(responseData.userId, responseData.token); //acessa o método de login no App.js
           } catch (err) {
           }
         }
