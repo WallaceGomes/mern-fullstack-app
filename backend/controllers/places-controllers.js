@@ -158,6 +158,14 @@ exports.updatePlace = async (req, res, next) => {
         return next(error);
     }
 
+    //somente o criador pode editar
+    //.toString() => método do mongose pois o id do criador é guardado como um objeto
+    // sendo assim tem que fazer o parse pra String
+    if(place.creator.toString() !== req.userData.userId){
+        const error = new HttpError('You are not allowed to edit this place. ID ERROR', 401);
+        return next(error);
+    }
+
     place.title = title;
     place.description = description;
 
@@ -186,6 +194,13 @@ exports.deletePlace = async (req, res, next) => {
 
     if (!place) {
         const error = new HttpError('Could not find place for this id', 404);
+        return next(error);
+    }
+
+    //somente o criador pode editar
+    //aqui não precisa so toString() pois o populate() já guarda o objeto e o id é uma string
+    if(place.creator.id !== req.userData.userId){
+        const error = new HttpError('You are not allowed to edit this place. ID ERROR', 401);
         return next(error);
     }
 

@@ -66,7 +66,7 @@ app.use((error, req, res, next) => {
 
 //conexão com o banco de dados
 mongoose
-    .connect('mongodb+srv://mernapp:testmern@clustermern-hwzsp.mongodb.net/mern?retryWrites=true&w=majority')
+    .connect('mongodb+srv://mernapp:testmern@clustermern-hwzsp.mongodb.net/mern?retryWrites=true&w=majority', { useNewUrlParser: true })
     .then(() => { // conexão ok
         app.listen(5000);
     })
