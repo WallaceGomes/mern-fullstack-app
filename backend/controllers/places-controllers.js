@@ -85,7 +85,7 @@ exports.createPlace = async (req, res, next) => {
        return next(new HttpError('Invalid inputs, check your data.', 422));
     }
 
-    const { title, description, address, creator } = req.body;
+    const { title, description, address} = req.body;
     //const title = req.body.title
 
     let coordinates;
@@ -101,12 +101,12 @@ exports.createPlace = async (req, res, next) => {
         address,
         location: coordinates,
         image: req.file.path,
-        creator
+        creator: req.userData.userId
     });
 
     let user;
     try{//tenta retornar o id de usuário do BD
-        user = await User.findById(creator);
+        user = await User.findById(req.userData.userId);
     }catch (err) {
         const error = new HttpError('Create place failed, could not find user', 500);
         return next(error);

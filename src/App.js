@@ -17,6 +17,7 @@ let logoutTimer;
 
 const App = () => {
 
+  //todo > 187 auth-hook
   const [token, setToken] = useState(false);
   const [tokenExpirationDate, setTokenExporationDate] = useState();
   const [userId, setUserID] = useState(false);
