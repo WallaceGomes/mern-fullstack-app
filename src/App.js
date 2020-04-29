@@ -13,37 +13,59 @@ import UpdatePlace from './places/pages/UpdatePlace';
 import Auth from './user/pages/Auth';
 import { AuthContext } from './shared/context/auth-context';
 
+let logoutTimer;
+
 const App = () => {
 
   const [token, setToken] = useState(false);
+  const [tokenExpirationDate, setTokenExporationDate] = useState();
   const [userId, setUserID] = useState(false);
 
   //necessário utilizar o useCallback para evitar a criação de novas funções e loops infinitos
   //sem dependências pois esta função não precisará ser recriada
-  const login = useCallback((uid, token) => {
+  const login = useCallback((uid, token, expirationDate) => {
     setToken(token);
+    setUserID(uid);
+    //Date getTime => tempo em milisegundos > +1000 * 60 * 60 = 1h > * 12 > 12h
+    //Se existir expirationDate é esse valor que quero usar para o token, caso contrário crio outro
+    const tokenExpirationDateNew = expirationDate || new Date(new Date().getTime() + 1000 * 60 * 60 * 12);
     //gravando token no localstorage para continuar logado mesmo depois do reload
+    setTokenExporationDate(tokenExpirationDateNew);
     localStorage.setItem(
       'userData',
       JSON.stringify({
         userId: uid,
-        token: token
+        token: token,
+        expiration: tokenExpirationDateNew.toISOString()
     }));
-    setUserID(uid);
   },[]);
 
   const logout = useCallback(() => {
     setToken(null);
     setUserID(null);
+    setTokenExporationDate(null);
     //quando logout apaga as credenciais (userId, token)
     localStorage.removeItem('userData');
   },[]);
 
+  //auto logout
+  useEffect(() => {
+    if(token && tokenExpirationDate){
+      //getTime() => retorna o tempo em milisegundos
+      const remainingTime = tokenExpirationDate.getTime() - new Date().getTime();
+      logoutTimer = setTimeout(logout, remainingTime);
+    }else{
+      clearTimeout(logoutTimer);
+    }
+  }, [token, logout, tokenExpirationDate])
+
   //seguindo o ciclo de vida, o useEffect roda depois ao final do render
   useEffect(() => {
     const storedData = JSON.parse(localStorage.getItem('userData'));
-    if(storedData && storedData.token){
-      login(storedData.userId, storedData.token);
+    //new Date(storedData.expiration) > new Date() 
+    //===> se a data que eu tiver for maior que a data de "agora" eu faço o login com ela
+    if(storedData && storedData.token && new Date(storedData.expiration) > new Date()){
+      login(storedData.userId, storedData.token, new Date(storedData.expiration));
     }
   }, [login]);
 
