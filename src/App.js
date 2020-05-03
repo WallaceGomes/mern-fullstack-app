@@ -1,17 +1,28 @@
-import React, { useCallback, useState, useEffect } from 'react';
+import React, { useCallback, useState, useEffect, Suspense } from 'react';
 import { BrowserRouter as Router, Route, Redirect, Switch} from 'react-router-dom';
 
 //Route = Define uma rota "path", é como um href
 //Redirect = Qualquer coisa diferente que for digitada no endereço será redirecionada
 //Switch = Quando uma rota for encontrada ao longo do código ele para nela
 
-import Users from './user/pages/Users';
-import NewPlace from './places/pages/NewPlace';
+//import Users from './user/pages/Users';
+//import NewPlace from './places/pages/NewPlace';
 import MainNavigation from './shared/components/Navigation/MainNavigation';
-import UserPlaces from './places/pages/UserPlaces';
-import UpdatePlace from './places/pages/UpdatePlace';
-import Auth from './user/pages/Auth';
+//import UserPlaces from './places/pages/UserPlaces';
+//import UpdatePlace from './places/pages/UpdatePlace';
+//import Auth from './user/pages/Auth';
 import { AuthContext } from './shared/context/auth-context';
+import LoadingSpinner from './shared/components/UIElements/LoadingSpinner';
+
+
+//Lazy download = Esses conteúdos somente serão carregados quando o usuário realmente precisar
+//isso diminui a quantidade de coisas que precisam ser baixadas e fazem o app ficar mais leve
+//lembrar da propriedade fallback do suspense
+const Users = React.lazy(() => import('./user/pages/Users'));
+const NewPlace = React.lazy(() => import('./places/pages/NewPlace'));
+const UserPlaces = React.lazy(() => import('./places/pages/UpdatePlace'));
+const UpdatePlace = React.lazy(() => import('./user/pages/Users'));
+const Auth = React.lazy(() => import('./user/pages/Auth'));
 
 let logoutTimer;
 
@@ -126,7 +137,16 @@ const App = () => {
     >
       <Router>
         <MainNavigation/>
-        <main>{routes}</main>
+        <main>
+          <Suspense
+            fallback={
+              <div className="center">
+                <LoadingSpinner/>
+              </div>
+            }
+            >{routes}
+          </Suspense>
+        </main>
       </Router>
     </AuthContext.Provider>
   );
