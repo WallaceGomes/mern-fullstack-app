@@ -21,7 +21,7 @@ const Users = () => {
                 //para uma operção get, não é necessário enviar mais nada por aqui
                 // o hook já está configurado com valores padrões
                 const responseData = await sendRequest(
-                    'http://localhost:5000/api/users'
+                    process.env.REACT_APP_BACKEND_URL + '/users'
                 );
 
                 setLoadedUsers(responseData.users);

@@ -80,7 +80,7 @@ exports.signup = async (req, res, next) => {
     try{
         token = jwt.sign(
             { userId: createdUser.id, email: createdUser.email },
-            'palaversercretajwt',
+            process.env.JWT_KEY,
             { expiresIn: '12h' }
         );
     }catch(err) {
@@ -146,7 +146,7 @@ exports.login = async (req, res, next) => {
     try{
         token = jwt.sign(
             { userId: existingUser.id, email: existingUser.email },
-            'palaversercretajwt',
+            process.env.JWT_KEY,
             { expiresIn: '12h' }
         );
     }catch(err) {

@@ -1,0 +1,8 @@
+{
+    "env": {
+        "DB_USER": "mernapp",
+        "DB_PASS": "testmern",
+        "DB_NAME": "clustermern",
+        "JWT_KEY": "palaversercretajwt"
+    }
+}
